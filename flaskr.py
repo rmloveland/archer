@@ -89,6 +89,13 @@ def show_entries():
 
 ## View 2. Add a new entry.
 
+@app.route('/add', methods=['GET'])
+def show_add_entry():
+    """
+    This view just renders the `add an entry' page.
+    """
+    return render_template('add_entry.html')
+
 @app.route('/add', methods=['POST'])
 def add_entry():
     """
