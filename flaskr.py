@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sqlite3
+import os, sqlite3, urllib
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 # Create our little application. :-)
@@ -108,9 +108,41 @@ def add_entry():
         abort(401)
     db = get_db()
     db.execute('insert into entries (title, text) values (?, ?)',
-               [request.form['title'], request.form['text']])
+               [ request.form['title'], request.form['text'] ])
     db.commit()
     flash('A new entry was successfully posted!')
+    return redirect(url_for('show_entries'))
+
+@app.route('/edit/<title>', methods=['GET'])
+def show_edit_entry(title):
+    """
+    This view just renders the `edit an entry' page.
+    """
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    decoded_title = urllib.unquote(title)
+    cur = db.execute('select id, title, text from entries where title like ?',
+                     ('%'+decoded_title+'%',))
+    entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
+    entry = entries[0]          # Choose the first (best?) match found by the DB.
+    print entry
+    return render_template('edit_entry.html', entry=entry, decoded_title=decoded_title)
+
+@app.route('/edit', methods=['POST'])
+def edit_entry(entry):
+    """
+    This view lets the user actually save their edits to an entry.
+    """
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    title = entry.title
+    decoded_title = urllib.unquote(title)
+    db.execute('update entries set text=? where title like ?',
+               (request.form['text'], '%'+decoded_title+'%'))
+    db.commit()
+    flash('Saved your edits')
     return redirect(url_for('show_entries'))
 
 ## Views 3 and 4. Log in and out.
