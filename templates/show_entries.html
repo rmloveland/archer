@@ -8,7 +8,15 @@
 <ul class=entries>
 
 {% for entry in entries %}
-<li><h2>{{ entry.title }}</h2>{{ entry.text|safe }}</li>
+<li>
+  <h2>{{ entry.title }}</h2>
+  <p>
+    <a href="{{ url_for('show_edit_entry', title=entry.title) }}">Edit entry</a>
+  </p>
+  <p>
+    {{ entry.text|safe }}
+  </p>
+</li>
 
 {% else %}
 <li><em>Unbelievable -- no entries here so far...</em></li>
