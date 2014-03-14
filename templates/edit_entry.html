@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+
+{% if session.logged_in %}
+
+<p>
+  You are editing {{ decoded_title }}
+</p>
+
+<form action="{{ url_for('edit_entry') }}" method=post class=edit-entry>
+  <dl>
+    <dt>Text:
+      <dd>
+	<textarea name=text rows=5 cols=40>
+	  {{ entry.text }}
+	</textarea>
+    <dd><input type=submit value=Share>
+  </dl>
+</form>
+
+{% endif %}
+{% endblock %}
