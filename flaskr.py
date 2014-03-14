@@ -3,12 +3,16 @@
 import os, sqlite3, urllib
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
-# Create our little application. :-)
+### Flask configuration stuff.
+
+## Create our little application. :-)
+
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-# Load the default configuration and override it from an environment
-# variable.
+## Load the default config and override it from an environment
+## variable.
+
 app.config.update(dict(
     DATABASE = os.path.join(app.root_path, 'flaskr.db'),
     DEBUG = True,
@@ -18,6 +22,8 @@ app.config.update(dict(
 ))
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+
+### Database interactions.
 
 def connect_db():
     """Connects to the specific database."""
@@ -68,10 +74,9 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
+### Views.
 
-### The 4 views of the application.
-
-## View 1. Show all entries.
+## Showing all the entries.
 
 @app.route('/')
 def show_entries():
@@ -87,7 +92,7 @@ def show_entries():
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
-## View 2. Add a new entry.
+## Adding entries.
 
 @app.route('/add', methods=['GET'])
 def show_add_entry():
@@ -113,6 +118,8 @@ def add_entry():
     flash('A new entry was successfully posted!')
     return redirect(url_for('show_entries'))
 
+## Editing entries.
+
 @app.route('/edit/<title>', methods=['GET'])
 def show_edit_entry(title):
     """
@@ -129,15 +136,14 @@ def show_edit_entry(title):
     print entry
     return render_template('edit_entry.html', entry=entry, decoded_title=decoded_title)
 
-@app.route('/edit', methods=['POST'])
-def edit_entry(entry):
+@app.route('/edit/<title>', methods=['POST'])
+def edit_entry(title):
     """
     This view lets the user actually save their edits to an entry.
     """
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    title = entry.title
     decoded_title = urllib.unquote(title)
     db.execute('update entries set text=? where title like ?',
                (request.form['text'], '%'+decoded_title+'%'))
@@ -145,7 +151,7 @@ def edit_entry(entry):
     flash('Saved your edits')
     return redirect(url_for('show_entries'))
 
-## Views 3 and 4. Log in and out.
+# Authentication.  Logging in and out.
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -177,6 +183,8 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
+
+### Run the program.
 
 if __name__ == '__main__':
     app.run()
