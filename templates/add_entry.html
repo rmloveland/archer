@@ -5,10 +5,11 @@
 <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
   <dl>
     <dt>Title:
-    <dd><input type=text size=40 name=title>
-    <dt>Text:
-      <dd><textarea name=text rows=5 cols=40></textarea>
-    <dd><input type=submit value=Share>
+      <dd><input type=text size=40 name=title>
+	  <dt>Text:
+	    <dd><textarea name=text rows=5 cols=40></textarea>
+	      <dd><input type=submit value=Save>
+		  <a href="{{ url_for('show_entries') }}">Cancel</a>
   </dl>
 </form>
 {% endif %}

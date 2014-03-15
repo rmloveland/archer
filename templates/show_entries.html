@@ -10,9 +10,6 @@
 {% for entry in entries %}
 <li>
   <a href="{{ url_for('view_entry', title=entry.title) }}"><h2>{{ entry.title }}</h2></a>
-  <p>
-    {{ entry.text|safe }}
-  </p>
 </li>
 
 {% else %}

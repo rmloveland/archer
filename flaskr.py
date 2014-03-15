@@ -88,7 +88,7 @@ def show_entries():
     the rendered template.
     """
     db = get_db()
-    cur = db.execute('select title, text from entries order by id desc')
+    cur = db.execute('select title, text from entries order by title asc')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
@@ -97,6 +97,7 @@ def show_entries():
 @app.route('/view/<title>', methods=['GET'])
 def view_entry(title):
     """
+    View a single entry by itself, on its own page.
     """
     decoded_title = urllib.unquote(title)
     db = get_db()
