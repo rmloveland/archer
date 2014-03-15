@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os, sqlite3, urllib
+import markdown, html2text
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 ### Flask configuration stuff.
@@ -127,8 +128,9 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
+    html_text = markdown.markdown(request.form['text'])
     db.execute('insert into entries (title, text) values (?, ?)',
-               [ request.form['title'], request.form['text'] ])
+               [ request.form['title'], html_text ])
     db.commit()
     flash('A new entry was successfully posted!')
     return redirect(url_for('show_entries'))
@@ -144,12 +146,12 @@ def show_edit_entry(title):
         abort(401)
     db = get_db()
     decoded_title = urllib.unquote(title)
-    cur = db.execute('select id, title, text from entries where title like ?',
+    cur = db.execute('select title, text from entries where title like ?',
                      ('%'+decoded_title+'%',))
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
-    print entry
-    return render_template('edit_entry.html', entry=entry)
+    markdown_text = html2text.html2text(entry[1])   # The text of the entry.
+    return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text)
 
 @app.route('/edit/<title>', methods=['POST'])
 def edit_entry(title):
@@ -160,8 +162,9 @@ def edit_entry(title):
         abort(401)
     db = get_db()
     decoded_title = urllib.unquote(title)
+    html_text = markdown.markdown(request.form['text'])
     db.execute('update entries set text=? where title like ?',
-               (request.form['text'], '%'+decoded_title+'%'))
+               (html_text, '%'+decoded_title+'%'))
     db.commit()
     flash('Saved your edits')
     return redirect(url_for('show_entries'))
