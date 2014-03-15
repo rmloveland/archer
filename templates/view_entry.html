@@ -4,7 +4,7 @@
 <h2>{{ entry.title }}</h2>
 
 <p>
-  {{ entry.text }}
+  {{ entry.text|safe }}
 </p>
 
 <a href="/edit/{{ entry.title }}">Edit</a>
