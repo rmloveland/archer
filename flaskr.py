@@ -92,6 +92,20 @@ def show_entries():
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
+## Viewing entries.
+
+@app.route('/view/<title>', methods=['GET'])
+def view_entry(title):
+    """
+    """
+    decoded_title = urllib.unquote(title)
+    db = get_db()
+    cur = db.execute('select title, text from entries where title like ?',
+                     ('%' + decoded_title + '%',))
+    entries = cur.fetchall()
+    entry = entries[0]
+    return render_template('view_entry.html', entry=entry)
+
 ## Adding entries.
 
 @app.route('/add', methods=['GET'])
@@ -134,7 +148,7 @@ def show_edit_entry(title):
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
     print entry
-    return render_template('edit_entry.html', entry=entry, decoded_title=decoded_title)
+    return render_template('edit_entry.html', entry=entry)
 
 @app.route('/edit/<title>', methods=['POST'])
 def edit_entry(title):

@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>{{ entry.title }}</h2>
+
+<p>
+  {{ entry.text }}
+</p>
+
+<a href="/edit/{{ entry.title }}">Edit</a>
+
+{% endblock %}
