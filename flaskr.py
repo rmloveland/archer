@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, sqlite3, urllib
+import os, re, sqlite3, urllib
 import markdown, html2text
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
@@ -129,8 +129,10 @@ def add_entry():
         abort(401)
     db = get_db()
     html_text = markdown.markdown(request.form['text'])
+    raw_title = request.form['title']
+    prettified_title = prettify(raw_title)
     db.execute('insert into entries (title, text) values (?, ?)',
-               [ request.form['title'], html_text ])
+               [ raw_title, html_text ])
     db.commit()
     flash('A new entry was successfully posted!')
     return redirect(url_for('show_entries'))
@@ -201,6 +203,13 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('show_entries'))
+
+### Utilities.
+
+def prettify(encoded_title):
+    first = re.sub('[ ,\'\?!]', '-', urllib.unquote(encoded_title))
+    second = re.sub('--', '-', urllib.unquote(first))
+    return re.sub('-$', '', urllib.unquote(second))
 
 ### Run the program.
 
