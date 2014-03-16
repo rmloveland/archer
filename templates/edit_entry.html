@@ -5,7 +5,7 @@
 
 <h2>{{ entry.title }}</h2>
 
-<form action="{{ url_for('edit_entry', title=entry.title) }}" method=post class=edit-entry>
+<form action="{{ url_for('edit_entry', title=entry.pretty_title) }}" method=post class=edit-entry>
   <dl>
     <dt>
       <dd>

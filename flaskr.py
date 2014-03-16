@@ -89,7 +89,7 @@ def show_entries():
     the rendered template.
     """
     db = get_db()
-    cur = db.execute('select title, text from entries order by title asc')
+    cur = db.execute('select title, pretty_title, text from entries order by title asc')
     entries = cur.fetchall()
     return render_template('show_entries.html', entries=entries)
 
@@ -100,10 +100,9 @@ def view_entry(title):
     """
     View a single entry by itself, on its own page.
     """
-    decoded_title = urllib.unquote(title)
     db = get_db()
-    cur = db.execute('select title, text from entries where title like ?',
-                     ('%' + decoded_title + '%',))
+    cur = db.execute('select title, pretty_title, text from entries where pretty_title like ?',
+                     ('%' + title + '%',))
     entries = cur.fetchall()
     entry = entries[0]
     return render_template('view_entry.html', entry=entry)
@@ -131,8 +130,8 @@ def add_entry():
     html_text = markdown.markdown(request.form['text'])
     raw_title = request.form['title']
     prettified_title = prettify(raw_title)
-    db.execute('insert into entries (title, text) values (?, ?)',
-               [ raw_title, html_text ])
+    db.execute('insert into entries (title, pretty_title, text) values (?, ?, ?)',
+               [ raw_title, prettified_title, html_text ])
     db.commit()
     flash('A new entry was successfully posted!')
     return redirect(url_for('show_entries'))
@@ -147,12 +146,11 @@ def show_edit_entry(title):
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    decoded_title = urllib.unquote(title)
-    cur = db.execute('select title, text from entries where title like ?',
-                     ('%'+decoded_title+'%',))
+    cur = db.execute('select title, pretty_title, text from entries where pretty_title like ?',
+                     ('%' + title + '%',))
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
-    markdown_text = html2text.html2text(entry[1])   # The text of the entry.
+    markdown_text = html2text.html2text(entry[2])   # The text of the entry.
     return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text)
 
 @app.route('/edit/<title>', methods=['POST'])
@@ -163,10 +161,9 @@ def edit_entry(title):
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    decoded_title = urllib.unquote(title)
     html_text = markdown.markdown(request.form['text'])
-    db.execute('update entries set text=? where title like ?',
-               (html_text, '%'+decoded_title+'%'))
+    db.execute('update entries set text=? where pretty_title like ?',
+               (html_text, '%' + title + '%'))
     db.commit()
     flash('Saved your edits')
     return redirect(url_for('show_entries'))
