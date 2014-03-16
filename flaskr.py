@@ -136,6 +136,24 @@ def add_entry():
     flash('A new entry was successfully posted!')
     return redirect(url_for('show_entries'))
 
+## Archiving entries.
+
+@app.route('/archive/<title>', methods=['GET'])
+def archive_entry(title):
+    """
+    """
+    if not session.get('logged_in'):
+        abort(401)
+    db = get_db()
+    # Archive it
+    db.execute('insert into archived_entries select * from entries where pretty_title like ?',
+               ('%' + title + '%',))
+    db.execute('delete from entries where pretty_title like ?',
+               ('%' + title + '%',))
+    db.commit()
+    flash('Archived page: ' + title)
+    return redirect(url_for('show_entries'))
+
 ## Editing entries.
 
 @app.route('/edit/<title>', methods=['GET'])
