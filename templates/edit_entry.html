@@ -11,7 +11,7 @@
       <dd>
 	<textarea name=text rows=5 cols=40>{{ markdown_text }}</textarea>
 	<dd><input type=submit value=Save>
-	    <a href="{{ url_for('view_entry', title=entry.title) }}">Cancel</a>
+	    <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">Cancel</a>
   </dl>
 </form>
 
