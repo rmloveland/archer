@@ -184,7 +184,7 @@ def edit_entry(title):
                (html_text, '%' + title + '%'))
     db.commit()
     flash('Saved your edits')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('view_entry', title=title))
 
 # Authentication.  Logging in and out.
 
