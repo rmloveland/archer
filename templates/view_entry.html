@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<h2>{{ entry.title }}</h2>
+<div class=bread-crumb>
+  <strong><a href={{ url_for('show_entries') }}>Home</a></strong>&nbsp;&raquo;&nbsp;<strong><a href={{ url_for('view_entry', title=entry.pretty_title) }}>{{ entry.title }}</a></strong>
+</div>
 
 <p>
   {{ entry.text|safe }}
