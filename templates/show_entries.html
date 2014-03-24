@@ -1,19 +1,8 @@
 {% extends "layout.html" %}
 {% block body %}
 
-{% if session.logged_in %}
-<a href="{{ url_for('show_add_entry') }}">Add page</a>
-{% endif %}
+<p>
+  This will become your home page. Write a home page here (or better yet, rethink the design a little).
+</p>
 
-<ul class=entries>
-
-{% for entry in entries %}
-<li>
-  <a href="{{ url_for('view_entry', title=entry.pretty_title) }}"><h2>{{ entry.title }}</h2></a>
-</li>
-
-{% else %}
-<li><em>Unbelievable -- no entries here so far...</em></li>
-{% endfor %}
-</ul>
 {% endblock %}
