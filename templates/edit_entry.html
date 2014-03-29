@@ -3,15 +3,19 @@
 
 {% if session.logged_in %}
 
-<h2>{{ entry.title }}</h2>
-
 <form action="{{ url_for('edit_entry', title=entry.pretty_title) }}" method=post class=edit-entry>
   <dl>
+    <dd><h1>{{ entry.title }}</h1></dd>
     <dt>
       <dd>
 	<textarea name=text>{{ markdown_text }}</textarea>
-	<dd><input type=submit value=Save>
-	    <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">Cancel</a>
+      </dd>
+      <dd>
+	<input type=submit value=Save>
+	  <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">Cancel</a>
+	</input>
+      </dd>
+    </dt>
   </dl>
 </form>
 

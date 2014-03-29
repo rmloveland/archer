@@ -1,15 +1,25 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<div class=bread-crumb>
-  <strong><a href={{ url_for('show_entries') }}>Home</a></strong>&nbsp;&raquo;&nbsp;<strong><a href={{ url_for('view_entry', title=entry.pretty_title) }}>{{ entry.title }}</a></strong>
+{% if session.logged_in %}
+<div class=page-actions>
+  <ul>
+    <li>
+      <a href="/edit/{{ entry.pretty_title }}">Edit</a>
+    </li>
+    <li>
+      <a href="/archive/{{ entry.pretty_title }}">Archive</a>
+    </li>
+  </ul>
 </div>
+{% endif %}
 
-<p>
+<!-- <div class=bread-crumb> -->
+<!--   <strong><a href={{ url_for('show_entries') }}>Home</a></strong>&nbsp;&raquo;&nbsp;<strong><a href={{ url_for('view_entry', title=entry.pretty_title) }}>{{ entry.title }}</a></strong> -->
+<!-- </div> -->
+
+<div class=page-text>
   {{ entry.text|safe }}
-</p>
-
-<a href="/edit/{{ entry.pretty_title }}">Edit</a>
-<a href="/archive/{{ entry.pretty_title }}">Archive</a>
+</div>
 
 {% endblock %}

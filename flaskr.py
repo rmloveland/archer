@@ -88,9 +88,7 @@ def show_entries():
     entries as dicts to the `show_entries.html' template and return
     the rendered template.
     """
-    db = get_db()
-    cur = db.execute('select title, pretty_title, text from entries order by title asc')
-    entries = cur.fetchall()
+    entries = get_entries()
     return render_template('show_entries.html', entries=entries)
 
 ## Viewing entries.
@@ -103,9 +101,10 @@ def view_entry(title):
     db = get_db()
     cur = db.execute('select title, pretty_title, text from entries where pretty_title like ?',
                      ('%' + title + '%',))
-    entries = cur.fetchall()
-    entry = entries[0]
-    return render_template('view_entry.html', entry=entry)
+    the_entries = cur.fetchall()
+    entry = the_entries[0]
+    entries = get_entries()
+    return render_template('view_entry.html', entry=entry, entries=entries)
 
 ## Adding entries.
 
@@ -114,7 +113,8 @@ def show_add_entry():
     """
     This view just renders the `add an entry' page.
     """
-    return render_template('add_entry.html')
+    entries = get_entries()    
+    return render_template('add_entry.html', entries=entries)
 
 @app.route('/add', methods=['POST'])
 def add_entry():
@@ -134,7 +134,7 @@ def add_entry():
                [ raw_title, prettified_title, html_text ])
     db.commit()
     flash('A new entry was successfully posted!')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('view_entry', title=prettified_title))
 
 ## Archiving entries.
 
@@ -169,7 +169,8 @@ def show_edit_entry(title):
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
     markdown_text = html2text.html2text(entry[2])   # The text of the entry.
-    return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text)
+    entries = get_entries()                         # Show the list of pages in the wiki.
+    return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text, entries=entries)
 
 @app.route('/edit/<title>', methods=['POST'])
 def edit_entry(title):
@@ -205,7 +206,8 @@ def login():
             session['logged_in'] = True
             flash('You were logged in')
             return redirect(url_for('show_entries'))
-    return render_template('login.html', error=error)
+    entries = get_entries()
+    return render_template('login.html', error=error, entries=entries)
 
 @app.route('/logout')
 def logout():
@@ -225,6 +227,12 @@ def prettify(encoded_title):
     first = re.sub('[ ,\'\?!]', '-', urllib.unquote(encoded_title))
     second = re.sub('--', '-', urllib.unquote(first))
     return re.sub('-$', '', urllib.unquote(second))
+
+def get_entries():
+    db = get_db()
+    cur = db.execute('select title, pretty_title, text from entries order by title asc')
+    entries = cur.fetchall()
+    return entries
 
 ### Run the program.
 
