@@ -1,0 +1,7 @@
+- add pygments?
+- make sure it works with python 3? (by 2020)
+- add user groups and permissioning
+  - (see /Users/rloveland/Code/Flask-User-starter-app)
+- add support for conditional text based on user type
+  - this is supported by asciidoc
+
