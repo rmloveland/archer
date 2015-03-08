@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os, re, sqlite3, urllib
+import codecs, os, re, sqlite3, urllib, hglib
 import markdown, html2text
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
@@ -19,7 +19,8 @@ app.config.update(dict(
     DEBUG = True,
     SECRET_KEY = 'development key',
     USERNAME = 'admin',
-    PASSWORD = 'default'
+    PASSWORD = 'default',
+    HGREPO = os.path.join(app.root_path, 'static/files/')
 ))
 
 app.config.from_envvar('FLASKR_SETTINGS', silent=True)
@@ -127,14 +128,36 @@ def add_entry():
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    html_text = markdown.markdown(request.form['text'])
+    text = request.form['text']
+    text.encode('utf-8').strip()
+    html_text = markdown.markdown(text)
     raw_title = request.form['title']
     prettified_title = prettify(raw_title)
     db.execute('insert into entries (title, pretty_title, text) values (?, ?, ?)',
                [ raw_title, prettified_title, html_text ])
     db.commit()
+    store(prettified_title, text, addFile=True)
     flash('A new entry was successfully posted!')
     return redirect(url_for('view_entry', title=prettified_title))
+
+def touch_file(filepath):
+    fname = filepath
+    with codecs.open(fname, 'w', 'utf-8') as f: f.write('')
+
+def store(title, text, addFile=False):
+    repo_path = os.path.abspath(app.config['HGREPO'])
+    pretty_title = prettify(title)
+    file_path = os.path.join(repo_path, pretty_title)
+    text.encode('utf-8')
+    client = hglib.open(repo_path)
+    if not os.path.exists(file_path):
+        touch_file(file_path)
+    with codecs.open(file_path, 'w', 'utf-8') as fout:
+        fout.write(text)
+    if addFile:
+        client.add(file_path)
+    client.commit('Commit', addremove=True, user=app.config['USERNAME'])
+    client.close()
 
 ## Archiving entries.
 
@@ -180,10 +203,13 @@ def edit_entry(title):
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    html_text = markdown.markdown(request.form['text'])
+    text = request.form['text']
+    text.encode('utf-8').strip()
+    html_text = markdown.markdown(text)
     db.execute('update entries set text=? where pretty_title like ?',
                (html_text, '%' + title + '%'))
     db.commit()
+    store(title, text)
     flash('Saved your edits')
     return redirect(url_for('view_entry', title=title))
 
