@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import codecs, os, re, sqlite3, urllib, hglib
-import markdown, html2text
+import markdown, markdown.extensions.attr_list
+import pdb
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
 ### Flask configuration stuff.
@@ -104,8 +105,10 @@ def view_entry(title):
                      ('%' + title + '%',))
     the_entries = cur.fetchall()
     entry = the_entries[0]
+    entry_text = entry['text']
+    entry_html = markdown.markdown(entry_text, ['attr_list'])
     entries = get_entries()
-    return render_template('view_entry.html', entry=entry, entries=entries)
+    return render_template('view_entry.html', entry=entry, entries=entries, entry_html=entry_html)
 
 ## Adding entries.
 
@@ -130,11 +133,10 @@ def add_entry():
     db = get_db()
     text = request.form['text']
     text.encode('utf-8').strip()
-    html_text = markdown.markdown(text)
     raw_title = request.form['title']
     prettified_title = prettify(raw_title)
     db.execute('insert into entries (title, pretty_title, text) values (?, ?, ?)',
-               [ raw_title, prettified_title, html_text ])
+               [ raw_title, prettified_title, text ])
     db.commit()
     store(prettified_title, text, addFile=True)
     flash('A new entry was successfully posted!')
@@ -156,7 +158,8 @@ def store(title, text, addFile=False):
         fout.write(text)
     if addFile:
         client.add(file_path)
-    client.commit('Commit', addremove=True, user=app.config['USERNAME'])
+    if client.diff():
+        client.commit('Commit', addremove=True, user=app.config['USERNAME'])
     client.close()
 
 ## Archiving entries.
@@ -191,7 +194,7 @@ def show_edit_entry(title):
                      ('%' + title + '%',))
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
-    markdown_text = html2text.html2text(entry[2])   # The text of the entry.
+    markdown_text = entry[2]
     entries = get_entries()                         # Show the list of pages in the wiki.
     return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text, entries=entries)
 
@@ -205,9 +208,8 @@ def edit_entry(title):
     db = get_db()
     text = request.form['text']
     text.encode('utf-8').strip()
-    html_text = markdown.markdown(text)
     db.execute('update entries set text=? where pretty_title like ?',
-               (html_text, '%' + title + '%'))
+               (text, '%' + title + '%'))
     db.commit()
     store(title, text)
     flash('Saved your edits')
