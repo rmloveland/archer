@@ -24,10 +24,10 @@
   {% endfor %}
 
   <ul class=entries>
-    <li><a href="/"><h2>Home</h2></a></li>
+    <li><a href="/"><strong>Home</strong></a></li>
     {% for entry in entries %}
     <li>
-      <a href="{{ url_for('view_entry', title=entry.pretty_title) }}"><h2>{{ entry.title }}</h2></a>
+      <a href="{{ url_for('view_entry', title=entry.pretty_title) }}"><strong>{{ entry.title }}</strong></a>
     </li>
     {% endfor %}
   </ul>
