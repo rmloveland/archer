@@ -2,6 +2,8 @@
 
 import codecs, os, re, sqlite3, urllib, hglib
 import markdown, markdown.extensions.attr_list
+import markdown.extensions.toc
+import markdown.extensions.tables
 import pdb
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
@@ -106,7 +108,14 @@ def view_entry(title):
     the_entries = cur.fetchall()
     entry = the_entries[0]
     entry_text = entry['text']
-    entry_html = markdown.markdown(entry_text, ['attr_list'])
+    entry_html = markdown.markdown(
+        entry_text, 
+        extensions=[
+         'markdown.extensions.attr_list', 
+         'markdown.extensions.tables', 
+         'markdown.extensions.toc'
+            ]
+        )
     entries = get_entries()
     return render_template('view_entry.html', entry=entry, entries=entries, entry_html=entry_html)
 
