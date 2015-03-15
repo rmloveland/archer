@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>Add a User</h2>
+
+{% if session.logged_in %}
+<form action="{{ url_for('add_user') }}" method=post class=add-user>
+  <dl>
+    <dd>Username:</dd>
+    <dd><input type=text size=40 name=username></input></dd>
+
+    <dd>Password:</dd>
+    <dd><input type=password name=password></input></dd>
+
+    <dd>Email (for account recovery):</dd>
+    <dd><input type=text size=40 name=email></input></dd>
+    <dd><input type=submit value=Save></input>
+      <a href="{{ url_for('show_entries') }}">Cancel</a></dd>
+  </dl>
+</form>
+{% endif %}
+{% endblock %}

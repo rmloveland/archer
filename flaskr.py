@@ -94,7 +94,8 @@ def show_entries():
     entries as dicts to the 'show_entries.html' template and return
     the rendered template.
     """
-    entries = get_entries()
+    user_group_name = session['user_group_name']
+    entries = get_entries(user_group_name)
     return render_template('show_entries.html', entries=entries)
 
 ## Viewing entries.
@@ -118,7 +119,8 @@ def view_entry(title):
          'markdown.extensions.toc'
             ]
         )
-    entries = get_entries()
+    user_group_name = session['user_group_name']
+    entries = get_entries(user_group_name)
     return render_template('view_entry.html', entry=entry, entries=entries, entry_html=entry_html)
 
 ## Adding entries.
@@ -128,7 +130,8 @@ def show_add_entry():
     """
     This view just renders the 'add an entry' page.
     """
-    entries = get_entries()
+    user_group_name = session['user_group_name']
+    entries = get_entries(user_group_name)
     return render_template('add_entry.html', entries=entries)
 
 @app.route('/page/add', methods=['POST'])
@@ -208,7 +211,9 @@ def show_edit_entry(title):
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
     markdown_text = entry[2]
-    entries = get_entries()                         # Show the list of pages in the wiki.
+
+    user_group_name = session['user_group_name']
+    entries = get_entries(user_group_name)
     return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text, entries=entries)
 
 @app.route('/edit/<title>', methods=['POST'])
@@ -242,14 +247,29 @@ def login():
       raw_username = request.form['username']
       raw_password = request.form['password']
       hashed_password = get_hashed_password(raw_username)
+      user_group_id, user_group_name = get_user_group_info(raw_username)
       if not pbkdf2_sha256.verify(raw_password, hashed_password):
             error = 'Invalid username'
       else:
         session['logged_in'] = True
+        session['username'] = raw_username
+        session['user_group_id'] = user_group_id
+        session['user_group_name'] = user_group_name
         flash('You were logged in')
         return redirect(url_for('show_entries'))
-    entries = get_entries()
+    user_group_name = session['user_group_name']
+    entries = get_entries(user_group_name)
     return render_template('login.html', error=error, entries=entries)
+
+def get_user_group_info(username):
+  db = get_db()
+  # cur = db.execute('select user_group_id from users where username like (?)', [ username ])
+  cur = db.execute('select id, groupname from user_groups where id == (select user_group_id from users where username like (?))', [ username ])
+  entries = cur.fetchall()
+  entry = entries[0]
+  user_group_id = entry['id']
+  user_group_name = entry['groupname']
+  return (user_group_id, user_group_name)
 
 def get_hashed_password(username):
   db = get_db()
@@ -259,7 +279,6 @@ def get_hashed_password(username):
   hashed_password = entry['hashed_password']
   return hashed_password
 
-
 # Creating users.
 
 @app.route('/users/add', methods=['GET'])
@@ -267,7 +286,11 @@ def show_add_user():
     '''
     This view just renders the 'add a user' page.
     '''
-    entries = get_entries()
+    user_group_name = session['user_group_name']
+    if not user_group_name == 'admin_users':
+      abort(401)
+
+    entries = get_entries(user_group_name)
     return render_template('add_user.html', entries=entries)
 
 @app.route('/users/add', methods=['POST'])
@@ -292,7 +315,10 @@ def add_user():
 @app.route('/users', methods=['GET'])
 def show_users():
   '''Show a list of all users.'''
-  entries = get_entries()
+  user_group_name = session['user_group_name']
+  if not user_group_name == 'admin_users':
+    abort(401)
+  entries = get_entries(user_group_name)
   users = get_users()
   return render_template('show_users.html', entries=entries, users=users)
 
@@ -304,7 +330,8 @@ def logout():
     key if present, or do nothing if the key is not there.  This means
     we don't have to explicitly check if the user is logged in.
     """
-    session.pop('logged_in', None)
+    session.clear()
+    session['user_group_name'] = ''
     flash('You were logged out')
     return redirect(url_for('show_entries'))
 
@@ -315,9 +342,12 @@ def prettify(encoded_title):
     second = re.sub('--', '-', urllib.unquote(first))
     return re.sub('-$', '', urllib.unquote(second))
 
-def get_entries():
+def get_entries(user_group_name):
     db = get_db()
-    cur = db.execute('select title, pretty_title, text from entries order by title asc')
+    if user_group_name == '':
+      return []
+    cur = db.execute('select title, pretty_title, text from entries where allowed_user_groups like (?) order by title asc',
+        ['%' + user_group_name + '%'])
     entries = cur.fetchall()
     return entries
 

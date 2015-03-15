@@ -1,3 +1,11 @@
+/* Conditional text using CSS */
+
+.console { display: none; }
+.publisher { display: none; }
+.admin { display: none }
+
+/* Main CSS */
+
 body {
     font-size: 16px;
     line-height: 1.6;

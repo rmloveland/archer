@@ -1,7 +1,21 @@
 {% extends "layout.html" %}
 {% block body %}
 
-{% if session.logged_in %}
+{% if session.user_group_name == 'console_users' %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='console-users.css') }}"></link>
+{% endif %}
+
+{% if session.user_group_name == 'publisher_users' %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='publisher-users.css') }}"></link>
+{% endif %}
+
+{% if session.user_group_name == 'admin_users' %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='admin-users.css') }}"></link>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='console-users.css') }}"></link>
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='publisher-users.css') }}"></link>
+{% endif %}
+
+{% if session.user_group_name == 'admin_users' %}
 <div class=page-actions>
   <ul>
     <li>
@@ -13,10 +27,6 @@
   </ul>
 </div>
 {% endif %}
-
-<!-- <div class=bread-crumb> -->
-<!--   <strong><a href={{ url_for('show_entries') }}>Home</a></strong>&nbsp;&raquo;&nbsp;<strong><a href={{ url_for('view_entry', title=entry.pretty_title) }}>{{ entry.title }}</a></strong> -->
-<!-- </div> -->
 
 <div class=page-text>
   {{ entry_html|safe }}

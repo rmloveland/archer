@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<h2>Show Users</h2>
+
+{% if session.logged_in %}
+
+<div class=page>
+  {% for message in get_flashed_messages() %}
+  <div class=flash>
+    {{ message }}
+  </div>
+  {% endfor %}
+
+  <table class=users>
+  <tr>
+    <th>
+      username
+    </th>
+    <th>
+      user ID
+    </th>
+    <th>
+      user group ID
+    </th>
+  </tr>
+    {% for user in users %}
+    <tr>
+      <td>
+        {{ user.username }}
+      </td>
+      <td>
+        {{ user.id }}
+      </td>
+      <td>
+        {{ user.user_group_id }}
+      </td>
+    </tr>
+    {% endfor %}
+  </ul>
+
+</div>
+
+{% endif %}
+{% endblock %}

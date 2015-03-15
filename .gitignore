@@ -1,3 +1,7 @@
 *.pyc
 *.db
 __pycache__
+TAGS
+static/files
+*.swp
+.virtualenv

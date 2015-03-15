@@ -10,11 +10,31 @@
 <div class=metanav>
   {% if not session.logged_in %}
   <a href="{{ url_for('login') }}">Log In</a>
-  {% else %}
+  {% elif session.user_group_name == 'admin_users' %}
+  <a href="{{ url_for('show_add_user') }}">Add User</a>
   <a href="{{ url_for('show_add_entry') }}">Add Page</a>
+  <a href="{{ url_for('show_users') }}">Show Users</a>
   <a href="{{ url_for('logout') }}">Log Out</a>
+  {% elif session.user_group_name != 'admin_users' %}
+  <a href="{{ url_for('logout') }}">Log Out</a>
+  {% else %}
   {% endif %}
 </div>
+
+{% if session.logged_in %}
+<div>
+  <p>
+    <ul>
+      <li>
+        user: {{ session.username }}
+      </li>
+      <li>
+        user group: {{ session.user_group_name }}
+      </li>
+    </ul>
+  </p>
+</div>
+{% endif %}
 
 <div class=page>
   {% for message in get_flashed_messages() %}
