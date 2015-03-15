@@ -99,7 +99,7 @@ def show_entries():
 
 ## Viewing entries.
 
-@app.route('/view/<title>', methods=['GET'])
+@app.route('/page/<title>', methods=['GET'])
 def view_entry(title):
     """
     View a single entry by itself, on its own page.
@@ -123,7 +123,7 @@ def view_entry(title):
 
 ## Adding entries.
 
-@app.route('/add', methods=['GET'])
+@app.route('/page/add', methods=['GET'])
 def show_add_entry():
     """
     This view just renders the 'add an entry' page.
@@ -131,7 +131,7 @@ def show_add_entry():
     entries = get_entries()
     return render_template('add_entry.html', entries=entries)
 
-@app.route('/add', methods=['POST'])
+@app.route('/page/add', methods=['POST'])
 def add_entry():
     """
     This view lets the user add new entries if they are logged
@@ -230,7 +230,7 @@ def edit_entry(title):
 
 # Authentication.  Logging in and out.
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/users/login', methods=['GET', 'POST'])
 def login():
     """
     Checks the user's credentials against those from the
@@ -262,7 +262,7 @@ def get_hashed_password(username):
 
 # Creating users.
 
-@app.route('/add-user', methods=['GET'])
+@app.route('/users/add', methods=['GET'])
 def show_add_user():
     '''
     This view just renders the 'add a user' page.
@@ -270,7 +270,7 @@ def show_add_user():
     entries = get_entries()
     return render_template('add_user.html', entries=entries)
 
-@app.route('/add-user', methods=['POST'])
+@app.route('/users/add', methods=['POST'])
 def add_user():
     username = request.form['username']
     text_password = request.form['password']
@@ -296,7 +296,7 @@ def show_users():
   users = get_users()
   return render_template('show_users.html', entries=entries, users=users)
 
-@app.route('/logout')
+@app.route('/users/logout')
 def logout():
     """
     Uses one neat trick to log the user out. If we use the POP method of
