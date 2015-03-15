@@ -238,19 +238,27 @@ def login():
     session.
     """
     error = None
-    # get_user(request.form['username'])
-    # pbkdf2_sha256.verify(raw_password, hashed_password)
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
+      raw_username = request.form['username']
+      raw_password = request.form['password']
+      hashed_password = get_hashed_password(raw_username)
+      if not pbkdf2_sha256.verify(raw_password, hashed_password):
             error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
-        else:
-            session['logged_in'] = True
-            flash('You were logged in')
-            return redirect(url_for('show_entries'))
+      else:
+        session['logged_in'] = True
+        flash('You were logged in')
+        return redirect(url_for('show_entries'))
     entries = get_entries()
     return render_template('login.html', error=error, entries=entries)
+
+def get_hashed_password(username):
+  db = get_db()
+  cur = db.execute('select hashed_password from users where username like (?)', [ username ])
+  entries = cur.fetchall()
+  entry = entries[0]
+  hashed_password = entry['hashed_password']
+  return hashed_password
+
 
 # Creating users.
 
