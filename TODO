@@ -4,4 +4,9 @@
   - (see /Users/rloveland/Code/Flask-User-starter-app)
 - add support for conditional text based on user type
   - this is supported by asciidoc
-
+  - markdown extension?
+- add table of contents to pages
+  - there's a markdown extension for this
+- choose an OSS license
+- full-text search with whoosh? or just use sqlite?
+- show currently logged-in user
