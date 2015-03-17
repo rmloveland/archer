@@ -1,12 +1,14 @@
 - add pygments?
-- make sure it works with python 3? (by 2020)
-- add user groups and permissioning
+- make sure it works with python 3? (by 2020 at least)
+X add user groups and permissioning
   - (see /Users/rloveland/Code/Flask-User-starter-app)
-- add support for conditional text based on user type
+X add support for conditional text based on user type
   - this is supported by asciidoc
   - markdown extension?
-- add table of contents to pages
+X add table of contents to pages
   - there's a markdown extension for this
 - choose an OSS license
 - full-text search with whoosh? or just use sqlite?
-- show currently logged-in user
+X show currently logged-in user
+- fix permissioning bug in `view_entry`
+  - specifically: we can have two pages with the same name, which is nice.  however, currently, the sql in `view_entry` only searches on page title and doesn't take into account the user group.  this manifests as a user who is only a member of `console_users` being able to see a wiki page which is one of two with the same name which is permissioned for users in the `publisher_users` group. (expected behavior: they only see the page with that title that is permissioned for the `console_users` group.)
