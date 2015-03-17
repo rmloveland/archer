@@ -8,6 +8,16 @@
     <dd><input type=text size=40 name=title></input></dd>
     <dd>Text:</dd>
     <dd><textarea name=text rows=5 cols=40></textarea></dd>
+
+    <dd>
+      Allowed user groups:
+    </dd>
+
+    <dd>
+      <input name=allowed_user_groups type=text value="admin_users">
+      </input>
+    </dd>
+
     <dd><input type=submit value=Save></input>
       <a href="{{ url_for('show_entries') }}">Cancel</a></dd>
   </dl>

@@ -8,12 +8,19 @@
     <dd><h1>{{ entry.title }}</h1></dd>
     <dt>
       <dd>
-	<textarea name=text>{{ markdown_text }}</textarea>
+        <textarea name=text>{{ markdown_text }}</textarea>
       </dd>
       <dd>
-	<input type=submit value=Save>
-	  <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">Cancel</a>
-	</input>
+        Allowed user groups:
+      </dd>
+      <dd>
+        <input name=allowed_user_groups type=text value={{ entry.allowed_user_groups }}>
+        </input>
+      </dd>
+      <dd>
+        <input type=submit value=Save>
+        <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">Cancel</a>
+        </input>
       </dd>
     </dt>
   </dl>

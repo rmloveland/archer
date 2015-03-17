@@ -14,6 +14,10 @@
 
     <dd>Email (for account recovery):</dd>
     <dd><input type=text size=40 name=email></input></dd>
+
+    <dd>User groups (for page access permissions and conditional text):</dd>
+    <dd><input type=text size=40 name=user_groups></input></dd>
+
     <dd><input type=submit value=Save></input>
       <a href="{{ url_for('show_entries') }}">Cancel</a></dd>
   </dl>

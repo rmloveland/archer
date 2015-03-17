@@ -23,8 +23,8 @@ create table users (
   hashed_password text not null,
   recovery_email text not null,
   user_active_p integer default 0,
-  user_group_id integer,
-  foreign key(user_group_id) references user_groups(id)
+  user_groups text,
+  foreign key(user_groups) references user_groups(groupname)
 );
 
 create table user_groups (

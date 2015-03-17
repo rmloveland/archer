@@ -6,6 +6,7 @@ import markdown.extensions.toc
 import markdown.extensions.tables
 import uuid
 import pdb
+import sets
 from passlib.hash import pbkdf2_sha256
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 
@@ -94,7 +95,10 @@ def show_entries():
     entries as dicts to the 'show_entries.html' template and return
     the rendered template.
     """
-    user_group_name = session['user_group_name']
+    if session:
+        user_group_name = session['user_group_name']
+    else:
+        user_group_name = ''
     entries = get_entries(user_group_name)
     return render_template('show_entries.html', entries=entries)
 
@@ -106,7 +110,7 @@ def view_entry(title):
     View a single entry by itself, on its own page.
     """
     db = get_db()
-    cur = db.execute('select title, pretty_title, text from entries where pretty_title like ?',
+    cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ?',
                      ('%' + title + '%',))
     the_entries = cur.fetchall()
     entry = the_entries[0]
@@ -150,8 +154,15 @@ def add_entry():
     raw_title = request.form['title']
     prettified_title = prettify(raw_title)
     uid = uuid.uuid4()
-    db.execute('insert into entries (title, pretty_title, text, uid) values (?, ?, ?, ?)',
-               [ raw_title, prettified_title, text, uid.hex ])
+    already_allowed = 'admin_users'
+    allowed_by_page = request.form['allowed_user_groups']
+    allowed_by_page = re.sub(' ','', allowed_by_page)
+    tmp1 = already_allowed + ',' + allowed_by_page
+    tmp2 = tmp1.split(',')
+    allowed_list = uniquify(tmp2)
+    allowed_string = ','.join(allowed_list)
+    db.execute('insert into entries (title, pretty_title, text, uid, allowed_user_groups) values (?, ?, ?, ?, ?)',
+               [ raw_title, prettified_title, text, uid.hex, allowed_string ])
     db.commit()
     store(prettified_title, text, addFile=True)
     flash('A new entry was successfully posted!')
@@ -206,12 +217,12 @@ def show_edit_entry(title):
     if not session.get('logged_in'):
         abort(401)
     db = get_db()
-    cur = db.execute('select title, pretty_title, text from entries where pretty_title like ?',
+    cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ?',
                      ('%' + title + '%',))
     entries = cur.fetchall()    # Returns an array of entries, each in a tuple.
     entry = entries[0]          # Choose the first (best?) match found by the DB.
     markdown_text = entry[2]
-
+    allowed_user_groups = entry[3]
     user_group_name = session['user_group_name']
     entries = get_entries(user_group_name)
     return render_template('edit_entry.html', entry=entry, markdown_text=markdown_text, entries=entries)
@@ -225,9 +236,10 @@ def edit_entry(title):
         abort(401)
     db = get_db()
     text = request.form['text']
+    allowed_user_groups = request.form['allowed_user_groups']
     text.encode('utf-8').strip()
-    db.execute('update entries set text=? where pretty_title like ?',
-               (text, '%' + title + '%'))
+    db.execute('update entries set text=?, allowed_user_groups=? where pretty_title like ?',
+               (text, allowed_user_groups, '%' + title + '%'))
     db.commit()
     store(title, text)
     flash('Saved your edits')
@@ -247,29 +259,29 @@ def login():
       raw_username = request.form['username']
       raw_password = request.form['password']
       hashed_password = get_hashed_password(raw_username)
-      user_group_id, user_group_name = get_user_group_info(raw_username)
+      user_group_name = get_user_group_name(raw_username)
       if not pbkdf2_sha256.verify(raw_password, hashed_password):
             error = 'Invalid username'
       else:
         session['logged_in'] = True
         session['username'] = raw_username
-        session['user_group_id'] = user_group_id
         session['user_group_name'] = user_group_name
         flash('You were logged in')
         return redirect(url_for('show_entries'))
-    user_group_name = session['user_group_name']
+    if session:
+        user_group_name = session['user_group_name']
+    else:
+        user_group_name = ''
     entries = get_entries(user_group_name)
     return render_template('login.html', error=error, entries=entries)
 
-def get_user_group_info(username):
+def get_user_group_name(username):
   db = get_db()
-  # cur = db.execute('select user_group_id from users where username like (?)', [ username ])
-  cur = db.execute('select id, groupname from user_groups where id == (select user_group_id from users where username like (?))', [ username ])
+  cur = db.execute('select user_groups from users where username == ?', [ username ])
   entries = cur.fetchall()
   entry = entries[0]
-  user_group_id = entry['id']
-  user_group_name = entry['groupname']
-  return (user_group_id, user_group_name)
+  user_group_name = entry['user_groups']
+  return user_group_name
 
 def get_hashed_password(username):
   db = get_db()
@@ -299,13 +311,13 @@ def add_user():
     text_password = request.form['password']
     hashed_password = pbkdf2_sha256.encrypt(text_password, rounds=2000, salt_size=16)
     recovery_email = request.form['email']
+    user_groups = request.form['user_groups']
     uid = uuid.uuid4()
-    user_group_id = 0
     user_active_p = True
     db = get_db()
-    cursor = db.execute('insert into users (uid, username, hashed_password, recovery_email, user_group_id, user_active_p) values (?, ?, ?, ?, ?, ?)',
+    cursor = db.execute('insert into users (uid, username, hashed_password, recovery_email, user_groups, user_active_p) values (?, ?, ?, ?, ?, ?)',
             [ uid.hex, username, hashed_password,
-                recovery_email, user_group_id, user_active_p ]) 
+                recovery_email, user_groups, user_active_p ]) 
     db.commit()
     flash('A new user was successfully posted!')
     return redirect(url_for('show_entries'))
@@ -337,6 +349,12 @@ def logout():
 
 ### Utilities.
 
+def uniquify(xs):
+    uniq = []
+    for x in set(xs):
+        uniq.append(x)
+    return uniq
+
 def prettify(encoded_title):
     first = re.sub('[ ,\'\?!]', '-', urllib.unquote(encoded_title))
     second = re.sub('--', '-', urllib.unquote(first))
@@ -346,14 +364,22 @@ def get_entries(user_group_name):
     db = get_db()
     if user_group_name == '':
       return []
-    cur = db.execute('select title, pretty_title, text from entries where allowed_user_groups like (?) order by title asc',
-        ['%' + user_group_name + '%'])
-    entries = cur.fetchall()
-    return entries
+
+    user_groups = user_group_name.split(',')
+    total_entries = []
+
+    for group in user_groups:
+        cur = db.execute('select title, pretty_title, text from entries where allowed_user_groups like (?) order by title asc',
+        ['%' + group + '%'])
+        entries = cur.fetchall()
+        for entry in entries:
+            total_entries.append(entry)
+
+    return total_entries
 
 def get_users():
   db = get_db()
-  cur = db.execute('select id, uid, user_group_id, username from users order by id asc')
+  cur = db.execute('select id, uid, user_groups, username from users order by id asc')
   users = cur.fetchall()
   return users
 
