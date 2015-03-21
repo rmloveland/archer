@@ -109,10 +109,20 @@ def view_entry(title):
     """
     View a single entry by itself, on its own page.
     """
+    if session:
+        user_group_name = session['user_group_name']
+        user_group_list = user_group_name.split(',')
+    else:
+        user_group_name = ''
+        user_group_list = []
+
+    user_group_list.sort()
+    user_group = user_group_list[0]
     db = get_db()
-    cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ?',
-                     ('%' + title + '%',))
+    cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ? and allowed_user_groups like ?',
+                     ('%' + title + '%', '%' + user_group + '%'))
     the_entries = cur.fetchall()
+
     entry = the_entries[0]
     entry_text = entry['text']
     entry_html = markdown.markdown(
@@ -123,7 +133,6 @@ def view_entry(title):
          'markdown.extensions.toc'
             ]
         )
-    user_group_name = session['user_group_name']
     entries = get_entries(user_group_name)
     return render_template('view_entry.html', entry=entry, entries=entries, entry_html=entry_html)
 
@@ -173,6 +182,7 @@ def touch_file(filepath):
     with codecs.open(fname, 'w', 'utf-8') as f: f.write('')
 
 def store(title, text, addFile=False):
+    ## TODO: now that we can have pages with the same titles, we should store the pages as a combination of path and UID (or something).
     repo_path = os.path.abspath(app.config['HGREPO'])
     pretty_title = prettify(title)
     user = app.config['USERNAME']
@@ -349,6 +359,16 @@ def logout():
 
 ### Utilities.
 
+def uniquify_sqlite_row_objects(xs):
+    results = []
+    seen = {}
+    for x in xs:
+        title = x['pretty_title']
+        if title not in seen:
+            results.append(x)
+        seen[title] = 1
+    return results
+
 def uniquify(xs):
     uniq = []
     for x in set(xs):
@@ -368,14 +388,20 @@ def get_entries(user_group_name):
     user_groups = user_group_name.split(',')
     total_entries = []
 
+    ## TODO: This "fixes" things for non-admin users (by removing redundant titles), but breaks things for admin users, since as an admin user I should be able to see all of the entries with the same name.
     for group in user_groups:
-        cur = db.execute('select title, pretty_title, text from entries where allowed_user_groups like (?) order by title asc',
-        ['%' + group + '%'])
+        cur = db.execute("select title, pretty_title, text from entries where allowed_user_groups regexp '[[:<:]]?[[:>:]]' order by title asc",
+        [ group ])
         entries = cur.fetchall()
         for entry in entries:
             total_entries.append(entry)
 
-    return total_entries
+    unique_entries = uniquify_sqlite_row_objects(total_entries)
+
+    if 'admin_users' in user_groups:
+        return total_entries
+    else:
+        return unique_entries
 
 def get_users():
   db = get_db()
