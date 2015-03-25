@@ -119,11 +119,15 @@ def view_entry(title):
     user_group_list.sort()
     user_group = user_group_list[0]
     db = get_db()
-    cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ? and allowed_user_groups like ?',
-                     ('%' + title + '%', '%' + user_group + '%'))
+    if 'admin_users' in user_group_list:
+      cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ?',
+          [ '%' + title + '%' ])
+    else:
+      cur = db.execute('select title, pretty_title, text, allowed_user_groups from entries where pretty_title like ? and allowed_user_groups like ?',
+          ('%' + title + '%', '%' + user_group + '%'))
     the_entries = cur.fetchall()
 
-    entry = the_entries[0]
+    entry = the_entries[0] # FIXME: This is the bug that keeps admin users from seeing everything
     entry_text = entry['text']
     entry_html = markdown.markdown(
         entry_text, 
@@ -390,8 +394,10 @@ def get_entries(user_group_name):
 
     ## TODO: This "fixes" things for non-admin users (by removing redundant titles), but breaks things for admin users, since as an admin user I should be able to see all of the entries with the same name.
     for group in user_groups:
-        cur = db.execute("select title, pretty_title, text from entries where allowed_user_groups regexp '[[:<:]]?[[:>:]]' order by title asc",
-        [ group ])
+        if 'admin_users' in user_groups:
+          cur = db.execute("select title, pretty_title, text from entries")
+        else:
+          cur = db.execute("select title, pretty_title, text from entries where allowed_user_groups like ?", [ '%' + group + '%' ])
         entries = cur.fetchall()
         for entry in entries:
             total_entries.append(entry)
