@@ -95,7 +95,7 @@ def show_entries():
     entries as dicts to the 'show_entries.html' template and return
     the rendered template.
     """
-    if session:
+    if session.has_key('user_group_name'):
         user_group_name = session['user_group_name']
     else:
         user_group_name = ''
@@ -273,16 +273,19 @@ def login():
       raw_username = request.form['username']
       raw_password = request.form['password']
       hashed_password = get_hashed_password(raw_username)
-      user_group_name = get_user_group_name(raw_username)
-      if not pbkdf2_sha256.verify(raw_password, hashed_password):
-            error = 'Invalid username'
+      if hashed_password:
+        user_group_name = get_user_group_name(raw_username)
+        if not pbkdf2_sha256.verify(raw_password, hashed_password):
+          error = 'Invalid username'
+        else:
+          session['logged_in'] = True
+          session['username'] = raw_username
+          session['user_group_name'] = user_group_name
+          flash('You were logged in')
+          return redirect(url_for('show_entries'))
       else:
-        session['logged_in'] = True
-        session['username'] = raw_username
-        session['user_group_name'] = user_group_name
-        flash('You were logged in')
-        return redirect(url_for('show_entries'))
-    if session:
+        flash('incorrect username or password')
+    if session.has_key('user_group_name'):
         user_group_name = session['user_group_name']
     else:
         user_group_name = ''
@@ -301,8 +304,12 @@ def get_hashed_password(username):
   db = get_db()
   cur = db.execute('select hashed_password from users where username like (?)', [ username ])
   entries = cur.fetchall()
-  entry = entries[0]
-  hashed_password = entry['hashed_password']
+  if entries:
+    entry = entries[0]
+    hashed_password = entry['hashed_password']
+  else:
+    hashed_password = False
+
   return hashed_password
 
 # Creating users.
