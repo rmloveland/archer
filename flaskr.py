@@ -276,7 +276,7 @@ def login():
       if hashed_password:
         user_group_name = get_user_group_name(raw_username)
         if not pbkdf2_sha256.verify(raw_password, hashed_password):
-          error = 'Invalid username'
+          error = 'invalid username or password'
         else:
           session['logged_in'] = True
           session['username'] = raw_username
