@@ -3,6 +3,7 @@ import flaskr
 import unittest
 import tempfile
 
+
 class FlaskrTestCase(unittest.TestCase):
 
     def setUp(self):
@@ -18,7 +19,6 @@ class FlaskrTestCase(unittest.TestCase):
     def test_empty_db(self):
         rv = self.app.get('/')
         assert 'no entries here so far' in rv.data
-
 
     def login(self, username, password):
         return self.app.post('/login', data=dict(
@@ -39,7 +39,6 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.login('admin', 'defaultx')
         assert 'Invalid password' in rv.data
 
-
     def test_messages(self):
         self.login('admin', 'default')
         rv = self.app.post('/add', data=dict(
@@ -52,4 +51,3 @@ class FlaskrTestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
-
