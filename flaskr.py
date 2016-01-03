@@ -335,6 +335,7 @@ def login():
     if request.method == 'POST':
         raw_username = request.form['username']
         raw_password = request.form['password']
+        user_group_name = ''  # FIXME ?
         if raw_username is 'admin' and raw_password is 'admin':
             session['logged_in'] = True
             session['username'] = raw_username
