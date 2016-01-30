@@ -15,7 +15,8 @@ body {
 }
 
 body a {
-    color: #191970;
+    max-width: 67%;
+  color:    #191970;
 }
 
 body h1 {
@@ -29,55 +30,28 @@ body h2, h3, h4, h5, h6 {
 
 .page {
     margin: 2em auto;
-    width: 50%;
-    /* border: 5px solid #bbb; */
     padding: 0.8em;
-    /* background: #f8f8ff; */
     font-family: Helvetica;
 }
 
 .page p {
-    margin: 1.5em 0 0 0;
-    font-size: large;
+  text-align: justify;
+  text-indent: auto;
+  hyphens: auto;
+  line-height: 1.45;
+  font-size: 18px;
 }
 
 .toc {
-    background-color: #ffd28c;
-    border: 1px solid black;
+    border: 2px solid maroon;
 }
 
 textarea {
-    width: 100%;
     height: 40em;
-}
-
-.entries {
-    list-style: none;
-    position: absolute;
-    left: 1em;
-    width: 20%;
-    height: 100%;
-    padding: 0;
-}
-
-.entries li {
-    margin-left: 1em;
-    margin: 0.8em 1.2em;
-}
-
-.entries li strong {
-    margin-left: -1em;
-    font-size: medium;
-    text-transform: uppercase;
-}
-
-.entries a {
-    text-decoration: none;
 }
 
 .add-entry {
     font-size: 0.9em;
-    /* border-bottom: 1px solid #CCC; */
 }
 
 .add-entry dl {
@@ -91,7 +65,7 @@ textarea {
     margin-left: -0.8em;
     margin-right: -0.8em;
     margin-top: -2em;
-    background-color: #ffa540;
+    background-color: maroon;
     height: 20%;
 }
 
@@ -109,8 +83,7 @@ textarea {
     margin-bottom: 2em;
     margin-left: -0.8em;
     margin-right: -0.8em;
-    background-color: gray;
-    /* background-color: #3d3d3d; */
+    background-color: #AAA;
     height: 20%;
 }
 
@@ -156,9 +129,7 @@ textarea {
     margin-left: -0.8em;
     margin-right: -0.8em;
     background-color: #3d3d3d;
-    /* width: 100%; */
     height: 16%;
-    /* border: 2px solid #036; */
 }
 
 .header a {
@@ -170,18 +141,4 @@ textarea {
     margin-left: 1em;
     margin-bottom: 0.8em;
     color: white;
-}
-
-pre {
-    margin-left: auto;
-    margin-right: auto;
-    background-color: #333;
-    color: #eee;
-    border: 2px solid #036;
-    overflow: auto;
-}
-
-code {
-    margin-left: 0.8em;
-    margin-right: 1.2em;
 }
