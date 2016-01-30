@@ -13,6 +13,11 @@ TODO
 
 + [ ] choose an OSS license
 
++ [ ] implement an 'export wiki' button
+
+    + this will let users download the static directory with all of the
+      markdown files (and hg repo) as a tarball.
+
 + [ ] full-text search (whoosh? or just use sqlite?)
 
 + [X] show currently logged-in user
@@ -20,7 +25,19 @@ TODO
 + [X] fix breakage if user or password doesn't exist
 
 + [X] fix user-level permissioning bug in `view_entry`
-  + specifically: we can have two pages with the same name, which is nice.  however, currently, the sql in `view_entry` only searches on page title and doesn't take into account the user group.  this manifests as a user who is only a member of `console_users` being able to see a wiki page which is one of two with the same name which is permissioned for users in the `publisher_users` group. (expected behavior: they only see the page with that title that is permissioned for the `console_users` group.)
+
+    + specifically: we can have two pages with the same name, which is
+      nice.  however, currently, the sql in `view_entry` only searches
+      on page title and doesn't take into account the user group.  this
+      manifests as a user who is only a member of `console_users` being
+      able to see a wiki page which is one of two with the same name
+      which is permissioned for users in the `publisher_users`
+      group. (expected behavior: they only see the page with that title
+      that is permissioned for the `console_users` group.)
 
 + [ ] fix admin-level permissioning bug in `view_entry`
-  + admin users will see pages with the same title listed twice (which is expected).  however, when the admin user clicks on one of the links, she is always taken to the first result in the array of results returned by the db.
+
+    + admin users will see pages with the same title listed twice (which
+      is expected).  however, when the admin user clicks on one of the
+      links, she is always taken to the first result in the array of
+      results returned by the db.
