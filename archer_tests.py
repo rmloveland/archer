@@ -1,20 +1,20 @@
 import os
-import flaskr
+import archer
 import unittest
 import tempfile
 
 
-class FlaskrTestCase(unittest.TestCase):
+class ArcherTestCase(unittest.TestCase):
 
     def setUp(self):
-        self.db_fd, flaskr.app.config['DATABASE'] = tempfile.mkstemp()
-        flaskr.app.config['TESTING'] = True
-        self.app = flaskr.app.test_client()
-        flaskr.init_db()
+        self.db_fd, archer.app.config['DATABASE'] = tempfile.mkstemp()
+        archer.app.config['TESTING'] = True
+        self.app = archer.app.test_client()
+        archer.init_db()
 
     def tearDown(self):
         os.close(self.db_fd)
-        os.unlink(flaskr.app.config['DATABASE'])
+        os.unlink(archer.app.config['DATABASE'])
 
     def test_empty_db(self):
         rv = self.app.get('/')

@@ -1,3 +1,0 @@
-export VIRTUAL_ENV=$HOME/.virtualenvs/flaskr_env
-export PATH=$VIRTUAL_ENV/bin:$PATH
-unset PYTHONHOME

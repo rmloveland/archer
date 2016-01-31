@@ -5,3 +5,4 @@ TAGS
 static/files
 *.swp
 .virtualenv
+virtualenv

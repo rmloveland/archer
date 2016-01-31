@@ -27,7 +27,7 @@ app.config.from_object(__name__)
 # variable.
 
 app.config.update(dict(
-    DATABASE=os.path.join(app.root_path, 'flaskr.db'),
+    DATABASE=os.path.join(app.root_path, 'archer.db'),
     DEBUG=True,
     SECRET_KEY='development key',
     USERNAME='admin',
@@ -35,7 +35,7 @@ app.config.update(dict(
     HGREPO=os.path.join(app.root_path, 'static/files/')
 ))
 
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+app.config.from_envvar('ARCHER_SETTINGS', silent=True)
 
 # Database interactions.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 DB_FILES = {
-    'DBFILE': 'flaskr.db',
+    'DBFILE': 'archer.db',
     'SCHEMA': 'schema.sql'
 }
 
