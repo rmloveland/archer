@@ -3,12 +3,14 @@ Archer
 
 Archer is a Flask-based wiki, backed by SQLite and Mercurial.
 
+**This is a personal prototype that's not ready for other people to
+use and you can safely ignore it.**
+
 Python's programmatic Mercurial interface is used for saving page
 edits into version control, while SQLite is used for serving the pages
 up inside the app, and full-text search.
 
-Basically this is a personal prototype that's not ready for other
-people to use; you can safely ignore it.
+License is [MIT](https://opensource.org/licenses/MIT).
 
 Overview
 --------
@@ -22,7 +24,10 @@ professional setting.  Right now that includes:
 + user groups
 + access control to certain pages based on user group
 
-In the future I'd like to work on features that would let me use it as an "everything bucket" of sorts that I can run on DO or some other service and access from anywhere.  Some features that would be cool to have include:
+In the future I'd like to work on features that would let me use it as
+an "everything bucket" of sorts that I can run on DO or some other
+service and access from anywhere.  Some features that would be cool to
+have include:
 
 + tagging pages and adding different "views", such as "wiki
   view" or "issue tracker view"
