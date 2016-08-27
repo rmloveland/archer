@@ -1,0 +1,100 @@
+<!-- -*- mode: markdown -*- -->
+
+# DESIGN
+
+This document contains some design notes, mostly captured at random (and in random order).  Not everything described in this file will be implemented or is even a good idea.
+
+## Tags / Labels
+
+Pages can be tagged.  Tags will probably be used to implement other features / support different workflows. 
+
+Tags can be used to turn the wiki into an issue tracker / offer an issue tracker "view" (See section 'Views').
+
+For example, maybe you could tag a page as `issue` and have it show up in the "Issue" view.
+
+It might be nice to add more structure to the tagging by allowing either:
+
++ tags (aka empty keys), or
++ a key=value pair, e.g., `type=issue`
+
+If we have key-value pairs, we can do some arbitrary page queries, e.g., assuming a JIRA-like query language:
+
+```
+name like "Geiser" and type=issue
+```
+
+I think there are some SQL syntax parsing libraries in Python you can use for this.
+
+# Expose SQL "where" clause-like search
+
+Rather than cater to "normals", let's just expose an SQL-like thing directly somehow.
+
+Basically this is like Atlassian's JQL or CQL (damn them -- some of their ideas/features are really really good - even if you do often feel a LOT of pain when you try to use their products in anger).
+
+# Views
+
+It would be cool to have different "views" of the data depending on what you want to achieve.
+
+For example, if you want to use it as a wiki / braindump thing, you can use the "wiki view".
+
+If you want to track TODO items, you can use the "issue tracker view".
+
+In the wiki view, you get a list of pages, with one page at a time in focus, available to read/edit, etc.
+
+In the issue tracker view, you see a stack of rectangles (styled unordered list?), ordered by priority (see section 'Tags' for more info about priority).
+
+# Export
+
+It would be cool to be able to export the site as a static HTML site at the press of a button, with links, etc., intact.  (I think there is a Flask add-on that allows this, need to look into that.)
+
+# Mobile
+
+It needs to be usable on mobile devices.  Like, duh.
+
+# Email
+
+Not sure if this feature would be a good idea (as it would likely add a lot of code complexity), but:
+
+It would be cool if you could email a *.MHT (WARC?) file to the wiki and it would get automagically transformed into a wiki page, that you could then edit/transform/whatever.
+
+(Aside: I don't want this to become an email client, I prefer native email clients.  This is meant to be a combo wiki/issue tracker/external brain, basically.  Sort of like Evernote but not as fancy. Things get dumped in, not sent out.)
+
+# Template / Config
+
+There should be a config file where you can choose your tri-color scheme and site logo.  Right now it's hard coded.
+
+# Page Edit Histories / Audit capabilities
+
+This should be easy enough to do from Mercurial, we just need to expose it in the UI.  ("just")
+
+# Database Backend
+
+Right now the backend is just raw SQL going to SQLite.  In order for this to be useful to teams we'll need to use an abstraction layer, I guess SQLAlchemy.
+
+Supporting multiple database backends would be good.  I'd really like to support CockroachDB as shown in this post:
+
+[Building an Application with CockroachDB and SQLAlchemy](https://www.cockroachlabs.com/blog/building-application-cockroachdb-sqlalchemy-2/)
+
+# REST API
+
+Not sure about this one.  I could re-abstract everything to be REST calls that send/receive JSON, but at the moment I'm not that interested in supporting other clients.
+
+Also (a related but heretical thought), the web app should remain relatively easy to scrape.
+
+Although really it should have a REST API in addition to being easily scrape-able.
+
+# RSS
+
+It should have an RSS feed.  I'm not sure how extensive yet.  Should we do all/one of:
+
++ new pages get added?
++ changes to page?
++ comments? (we don't even have comments yet, see section 'Comments')
+
+# Comments
+
+Not sure whether pages should have comments.  In old skool wiki, the comments are just page edits.  E.g., c2 wiki.  Seems simpler that way? 
+
+We could just have comments that are numbered and separated by header lines.
+
+Seems low-value at the moment.
