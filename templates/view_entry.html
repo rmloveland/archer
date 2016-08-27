@@ -36,7 +36,29 @@
 
 <div class=page-attributes>
   <p>
-    Allowed user groups: <strong>{{ entry.allowed_user_groups }}</strong>
+    Page attributes:
+    <ul>
+      <li>
+        Allowed user groups: {{ entry.allowed_user_groups }}
+      </li>
+    </ul>
   </p>
 </div>
+
+{% if session.logged_in %}
+<div class=user-attributes>
+  <p>
+    User attributes:
+    <ul>
+      <li>
+        username: {{ session.username }}
+      </li>
+      <li>
+        user groups: {{ session.user_group_name }}
+      </li>
+    </ul>
+  </p>
+</div>
+{% endif %}
+
 {% endblock %}
