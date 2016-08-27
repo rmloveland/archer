@@ -21,22 +21,6 @@
   {% endif %}
 </div>
 
-{% if session.logged_in %}
-<div>
-  <p>
-    <ul>
-      <li>
-        username: {{ session.username }}
-      </li>
-      <li>
-        user groups: {{ session.user_group_name }}
-      </li>
-    </ul>
-  </p>
-
-</div>
-{% endif %}
-
 <div class=page>
   {% for message in get_flashed_messages() %}
   <div class=flash>
