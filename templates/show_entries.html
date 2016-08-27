@@ -1,8 +1,24 @@
 {% extends "layout.html" %}
 {% block body %}
 
-<p>
-  This will become your home page. Write a home page here (or better yet, rethink the design a little).
-</p>
+<table>
+  <tr>
+    <th>
+      Pages
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <a href="/">Home</a>
+    </td>
+  </tr>
+  {% for entry in entries %}
+  <tr>
+    <td>
+      <a href="{{ url_for('view_entry', title=entry.pretty_title) }}">{{entry.title}}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
 
 {% endblock %}
