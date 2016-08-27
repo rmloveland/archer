@@ -1,0 +1,4 @@
+VIRTUAL_ENV="$HOME/.virtualenvs/archer_env"
+export VIRTUAL_ENV
+export PATH="$VIRTUAL_ENV/bin:$PATH"
+unset PYTHONHOME
