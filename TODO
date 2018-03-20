@@ -1,30 +1,19 @@
-TODO
-====
+#   -*- Mode: Org; -*-
+#+title: Archer TODOs
+#+author: Rich Loveland
+#+email: r@rmloveland.com
 
-+ [ ] add source highlighting (pygments?)
+** DONE add user groups and permissioning
 
-+ [ ] make sure it works with python 3? (by 2020 at least!)
+** DONE add support for conditional text based on user type
 
-+ [X] add user groups and permissioning
+** DONE add table of contents to pages
 
-+ [X] add support for conditional text based on user type
+** DONE show currently logged-in user
 
-+ [X] add table of contents to pages
+** DONE fix breakage if user or password doesn't exist
 
-+ [ ] choose an OSS license
-
-+ [ ] implement an 'export wiki' button
-
-    + this will let users download the static directory with all of the
-      markdown files (and hg repo) as a tarball.
-
-+ [ ] full-text search (whoosh? or just use sqlite?)
-
-+ [X] show currently logged-in user
-
-+ [X] fix breakage if user or password doesn't exist
-
-+ [X] fix user-level permissioning bug in `view_entry`
+** DONE fix user-level permissioning bug in `view_entry`
 
     + specifically: we can have two pages with the same name, which is
       nice.  however, currently, the sql in `view_entry` only searches
@@ -35,7 +24,20 @@ TODO
       group. (expected behavior: they only see the page with that title
       that is permissioned for the `console_users` group.)
 
-+ [ ] fix admin-level permissioning bug in `view_entry`
+** TODO add source highlighting (pygments?)
+
+** TODO make sure it works with python 3? (by 2020 at least!)
+
+** TODO choose an OSS license
+
+** TODO implement an 'export wiki' button
+
+    + this will let users download the static directory with all of the
+      markdown files (and hg repo) as a tarball.
+
+** TODO full-text search (whoosh? or just use sqlite?)
+
+** TODO fix admin-level permissioning bug in `view_entry`
 
     + admin users will see pages with the same title listed twice (which
       is expected).  however, when the admin user clicks on one of the
