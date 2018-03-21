@@ -516,9 +516,11 @@ def uniquify(xs):
 
 
 def prettify(encoded_title):
-    first = re.sub('[ ,\'\?!]', '-', urllib.unquote(encoded_title))
-    second = re.sub('--', '-', urllib.unquote(first))
-    return re.sub('-$', '', urllib.unquote(second))
+    unquote = urllib.parse.unquote
+    first   = re.sub('[ ,\'\?!]', '-', unquote(encoded_title))
+    second  = re.sub('--', '-', unquote(first))
+    third   = re.sub('-$', '', unquote(second))
+    return third
 
 
 def get_entries(user_group_name):
