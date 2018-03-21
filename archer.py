@@ -234,7 +234,7 @@ def store(title, text, addFile=False):
     with codecs.open(file_path, 'w', 'utf-8') as fout:
         fout.write(text)
     if addFile:
-        client.add(file_path)
+        client.add(bytes(file_path, 'utf-8'))
     if client.diff():
         client.commit(
             'Change to "{}".'.format(pretty_title),
