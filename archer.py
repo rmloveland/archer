@@ -517,9 +517,9 @@ def uniquify(xs):
 
 def prettify(encoded_title):
     unquote = urllib.parse.unquote
-    first   = re.sub('[ ,\'\?!]', '-', unquote(encoded_title))
-    second  = re.sub('--', '-', unquote(first))
-    third   = re.sub('-$', '', unquote(second))
+    first = re.sub('[ ,\'\?!]', '-', unquote(encoded_title))
+    second = re.sub('--', '-', unquote(first))
+    third = re.sub('-$', '', unquote(second))
     return third
 
 
@@ -566,6 +566,7 @@ def get_users():
     return users
 
 # Run the program.
+
 
 if __name__ == '__main__':
     app.run()
