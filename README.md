@@ -51,4 +51,4 @@ The short version:
 
     $ cd /path/to/archer && . ./.virtualenv
 
-    $ pip install markdown flask html2text hglib
+    $ pip install markdown html2text flask
