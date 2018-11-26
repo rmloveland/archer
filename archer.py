@@ -339,7 +339,7 @@ def login():
         if raw_username == 'admin' and raw_password == 'admin':
             session['logged_in'] = True
             session['username'] = raw_username
-            session['user_group_name'] = user_group_name
+            session['user_group_name'] = 'admin_users'
             flash('You were logged in')
             return redirect(url_for('show_entries'))
         hashed_password = get_hashed_password(raw_username)
