@@ -336,7 +336,7 @@ def login():
         raw_username = request.form['username']
         raw_password = request.form['password']
         user_group_name = ''  # FIXME ?
-        if raw_username is 'admin' and raw_password is 'admin':
+        if raw_username == 'admin' and raw_password == 'admin':
             session['logged_in'] = True
             session['username'] = raw_username
             session['user_group_name'] = user_group_name
