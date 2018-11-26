@@ -11,8 +11,9 @@ import re
 import sqlite3
 import urllib
 import uuid
+import hashlib
+from hmac import compare_digest
 from collections import namedtuple
-from passlib.hash import pbkdf2_sha256
 from flask import Flask, request, session, g
 from flask import redirect, url_for, abort, render_template, flash
 
@@ -345,7 +346,8 @@ def login():
         hashed_password = get_hashed_password(raw_username)
         if hashed_password:
             user_group_name = get_user_group_name(raw_username)
-            if not pbkdf2_sha256.verify(raw_password, hashed_password):
+            if not compare_digest(hashlib.sha256(raw_password.encode('utf-8')).digest(),
+                                  hashed_password):
                 error = 'invalid username or password'
             else:
                 session['logged_in'] = True
@@ -409,12 +411,8 @@ def show_add_user():
 @app.route('/users/add', methods=['POST'])
 def add_user():
     username = request.form['username']
-    text_password = request.form['password']
-    hashed_password = pbkdf2_sha256.encrypt(
-        text_password,
-        rounds=2000,
-        salt_size=16
-    )
+    text_password = request.form['password'].encode('utf-8')
+    hashed_password = hashlib.sha256(text_password).digest()
     recovery_email = request.form['email']
     user_groups = request.form['user_groups']
     uid = uuid.uuid4()
@@ -455,11 +453,7 @@ def make_user(username, password, email, groups, user_active_p=True):
     the_user = User(
         username,
         password,
-        pbkdf2_sha256.encrypt(
-            password,
-            rounds=2000,
-            salt_size=16
-        ),
+        hashlib.sha256(password).digest(),
         email,
         groups,
         uuid.uuid4(),
