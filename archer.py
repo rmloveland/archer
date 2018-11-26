@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import codecs
-import hglib
+# import hglib
 import markdown
 import markdown.extensions.attr_list
 import markdown.extensions.tables
@@ -209,7 +209,7 @@ def add_entry():
     db.execute(stmt,
                [raw_title, prettified_title, text, uid.hex, allowed_string])
     db.commit()
-    store(prettified_title, text, addFile=True)
+    # store(prettified_title, text, addFile=True)
     flash('A new entry was successfully posted!')
     return redirect(url_for('view_entry', title=prettified_title))
 
@@ -317,7 +317,7 @@ def edit_entry(title):
         (text, allowed_user_groups, '%' + title + '%')
     )
     db.commit()
-    store(title, text)
+    # store(title, text)
     flash('Saved your edits')
     return redirect(url_for('view_entry', title=title))
 
