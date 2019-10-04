@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import codecs
-# import hglib
+from git import Repo
 import markdown
 import markdown.extensions.attr_list
 import markdown.extensions.tables
@@ -33,7 +33,7 @@ app.config.update(dict(
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='admin',
-    HGREPO=os.path.join(app.root_path, 'static/files/')
+    GITREPO=os.path.join(os.getenv('ARCHER_DATA_DIR'))
 ))
 
 app.config.from_envvar('ARCHER_SETTINGS', silent=True)
@@ -210,7 +210,7 @@ def add_entry():
     db.execute(stmt,
                [raw_title, prettified_title, text, uid.hex, allowed_string])
     db.commit()
-    # store(prettified_title, text, addFile=True)
+    store(prettified_title, text, addFile=True)
     flash('A new entry was successfully posted!')
     return redirect(url_for('view_entry', title=prettified_title))
 
@@ -224,24 +224,22 @@ def touch_file(filepath):
 def store(title, text, addFile=False):
     # TODO: now that we can have pages with the same titles, we should store
     # the pages as a combination of path and UID (or something).
-    repo_path = os.path.abspath(app.config['HGREPO'])
+    repo_path = os.path.abspath(app.config['GITREPO'])
     pretty_title = prettify(title)
-    user = app.config['USERNAME']
     file_path = os.path.join(repo_path, pretty_title)
     text.encode('utf-8')
-    client = hglib.open(repo_path)
+    client = Repo(repo_path)
     if not os.path.exists(file_path):
         touch_file(file_path)
     with codecs.open(file_path, 'w', 'utf-8') as fout:
         fout.write(text)
-    if addFile:
-        client.add(bytes(file_path, 'utf-8'))
-    if client.diff():
-        client.commit(
-            'Change to "{}".'.format(pretty_title),
-            addremove=True,
-            user=user
-        )
+
+    index = client.index
+    index.add([file_path])
+
+    hcommit = client.head.commit
+    if hcommit.diff():
+        index.commit('Change to "{}".'.format(pretty_title))
     client.close()
 
 # Archiving entries.
@@ -318,7 +316,7 @@ def edit_entry(title):
         (text, allowed_user_groups, '%' + title + '%')
     )
     db.commit()
-    # store(title, text)
+    store(title, text)
     flash('Saved your edits')
     return redirect(url_for('view_entry', title=title))
 
